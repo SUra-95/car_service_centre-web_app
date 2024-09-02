@@ -17,4 +17,7 @@ Route::middleware([
     Route::get('/customer', function () {
         return view('customer');
     })->name('customer');
+    Route::get('/car', function () {
+        return view('car');
+    })->name('car');
 });

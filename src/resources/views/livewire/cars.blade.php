@@ -17,10 +17,10 @@
         </div>
     @endif
     <div class="mt-8 text-2xl flex justify-between">
-        <div>Customers</div>
+        <div>Cars</div>
         <div class="mr-2">
             <x-button wire:click="confirmCustomerAddition" class="!bg-blue-800 hover:!bg-blue-900">
-                {{ __('Add new Customer') }}
+                {{ __('Add new Car') }}
             </x-button>
         </div>
     </div>
@@ -35,16 +35,16 @@
             <thead>
                 <tr>
                     <th class="px-4 py-2">
-                        <div class="flex items-center">NIC</div>
+                        <div class="flex items-center">Registration Number</div>
                     </th>
                     <th class="px-4 py-2">
-                        <div class="flex items-center">Name</div>
+                        <div class="flex items-center">Model</div>
                     </th>
                     <th class="px-4 py-2">
-                        <div class="flex items-center">Email</div>
+                        <div class="flex items-center">Fuel Type</div>
                     </th>
                     <th class="px-4 py-2">
-                        <div class="flex items-center">Phone</div>
+                        <div class="flex items-center">Transmission</div>
                     </th>
                     <th class="px-4 py-2">
                         <div class="flex items-center">Action</div>
@@ -53,18 +53,18 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($customers as $customer)
+                @foreach ($cars as $car)
                     <tr>
-                        <td class="border px-4 py-2 ">{{ $customer->NIC }}</td>
-                        <td class="border px-4 py-2 ">{{ $customer->name }}</td>
-                        <td class="border px-4 py-2 ">{{ $customer->email }}</td>
-                        <td class="border px-4 py-2 ">{{ $customer->phone }}</td>
+                        <td class="border px-4 py-2 ">{{ $car->registration_number }}</td>
+                        <td class="border px-4 py-2 ">{{ $car->model }}</td>
+                        <td class="border px-4 py-2 ">{{ $car->fuel_type }}</td>
+                        <td class="border px-4 py-2 ">{{ $car->transmission }}</td>
                         <td class="border px-4 py-2 ">
-                            <x-button wire:click="confirmCustomerEditing({{ $customer->id }})"
+                            <x-button wire:click="confirmCustomerEditing({{ $car->id }})"
                                 class="!bg-slate-700 hover:!bg-slate-800">
                                 {{ __('Edit') }}
                             </x-button>
-                            <x-danger-button wire:click="confirmCustomerDeletion({{ $customer->id }})"
+                            <x-danger-button wire:click="confirmCustomerDeletion({{ $car->id }})"
                                 wire:loading.attr="disabled">
                                 {{ __('Delete') }}
                             </x-danger-button>
@@ -75,7 +75,7 @@
         </table>
     </div>
     <div class="mt-4">
-        {{ $customers->links() }}
+        {{ $cars->links() }}
     </div>
 
     <x-confirmation-modal wire:model.live="confirmingCustomerDeletion">
@@ -102,40 +102,34 @@
 
     <x-dialog-modal wire:model.live="confirmingCustomerAddition">
         <x-slot name="title">
-            {{ isset($this->customer['id']) ? 'Edit Customer' : 'Add Customer' }}
+            {{ isset($this->car['id']) ? 'Edit Car' : 'Add Car' }}
         </x-slot>
 
 
         <x-slot name="content">
             <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="NIC" value="{{ __('NIC') }}" />
-                <x-input id="NIC" name="customer.NIC" type="text" class="mt-1 block w-full"
-                    wire:model="customer.NIC" required />
-                <x-input-error for="customer.NIC" class="mt-2" />
+                <x-label for="registration_number" value="{{ __('registration_number') }}" />
+                <x-input id="registration_number" name="car.registration_number" type="text" class="mt-1 block w-full"
+                    wire:model="car.registration_number" required />
+                <x-input-error for="car.registration_number" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="name" value="{{ __('Name') }}" />
-                <x-input id="name" name="customer.name" type="text" class="mt-1 block w-full"
-                    wire:model="customer.name" required />
-                <x-input-error for="customer.name" class="mt-2" />
+                <x-label for="model" value="{{ __('Model') }}" />
+                <x-input id="model" name="car.model" type="text" class="mt-1 block w-full"
+                    wire:model="car.model" required />
+                <x-input-error for="car.model" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" name="customer.email" type="text" class="mt-1 block w-full"
-                    wire:model="customer.email" required />
-                <x-input-error for="customer.email" class="mt-2" />
+                <x-label for="fuel_type" value="{{ __('Fuel_type') }}" />
+                <x-input id="fuel_type" name="car.fuel_type" type="text" class="mt-1 block w-full"
+                    wire:model="car.fuel_type" required />
+                <x-input-error for="car.fuel_type" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="phone" value="{{ __('Phone') }}" />
-                <x-input id="phone" name="customer.phone" type="text" class="mt-1 block w-full"
-                    wire:model="customer.phone" required />
-                <x-input-error for="customer.phone" class="mt-2" />
-            </div>
-            <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="address" value="{{ __('Address') }}" />
-                <x-input id="address" name="customer.address" type="text" class="mt-1 block w-full"
-                    wire:model="customer.address" required />
-                <x-input-error for="customer.address" class="mt-2" />
+                <x-label for="transmission" value="{{ __('Transmission') }}" />
+                <x-input id="transmission" name="car.transmission" type="text" class="mt-1 block w-full"
+                    wire:model="car.transmission" required />
+                <x-input-error for="car.transmission" class="mt-2" />
             </div>
         </x-slot>
 
@@ -144,7 +138,7 @@
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-danger-button class="ms-3" wire:click="saveCustomer" wire:loading.attr="disabled">
+            <x-danger-button class="ms-3" wire:click="saveCar" wire:loading.attr="disabled">
                 {{ __('Save') }}
             </x-danger-button>
         </x-slot>

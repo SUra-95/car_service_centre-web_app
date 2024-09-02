@@ -88,28 +88,28 @@
         <x-slot name="content">
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="NIC" value="{{ __('NIC') }}" />
-                <x-input id="NIC" name="NIC" type="text" class="mt-1 block w-full" wire:model="NIC" required />
-                <x-input-error for="NIC" class="mt-2" />
+                <x-input id="NIC" name="customer.NIC" type="text" class="mt-1 block w-full" wire:model="customer.NIC" required />
+                <x-input-error for="customer.NIC" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="name" value="{{ __('Name') }}" />
-                <x-input id="name" name="name" type="text" class="mt-1 block w-full" wire:model="name" required />
-                <x-input-error for="name" class="mt-2" />
+                <x-input id="name" name="customer.name" type="text" class="mt-1 block w-full" wire:model="customer.name" required />
+                <x-input-error for="customer.name" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" name="email" type="text" class="mt-1 block w-full" wire:model="email" required />
-                <x-input-error for="email" class="mt-2" />
+                <x-input id="email" name="customer.email" type="text" class="mt-1 block w-full" wire:model="customer.email" required />
+                <x-input-error for="customer.email" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="phone" value="{{ __('Phone') }}" />
-                <x-input id="phone" name="phone" type="text" class="mt-1 block w-full" wire:model="phone" required />
-                <x-input-error for="phone" class="mt-2" />
+                <x-input id="phone" name="customer.phone" type="text" class="mt-1 block w-full" wire:model="customer.phone" required />
+                <x-input-error for="customer.phone" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="address" value="{{ __('Address') }}" />
-                <x-input id="address" name="address" type="text" class="mt-1 block w-full" wire:model="address" required />
-                <x-input-error for="address" class="mt-2" />
+                <x-input id="address" name="customer.address" type="text" class="mt-1 block w-full" wire:model="customer.address" required />
+                <x-input-error for="customer.address" class="mt-2" />
             </div>
         </x-slot>
 

@@ -11,46 +11,57 @@ class Customers extends Component
     use WithPagination;
 
     public $search;
-    public $customer;
-    public $NIC, $name, $email, $phone, $address;
+    // public $NIC, $name, $email, $phone, $address;
     public $confirmingCustomerDeletion = false;
     public $confirmingCustomerAddition = false;
     public $password;
+    public $customer = [
+        'NIC' => '',
+        'name' => '',
+        'email' => '',
+        'phone' => '',
+        'address' => '',
+    ];
     protected $queryString = [
         'search' => ['except' => '']
     ];
     protected $rules = [
-        'NIC' => 'required|min:10|max:15',
-        'name' => 'required|min:3|max:50',
-        'email' => 'required|email',
-        'password' => 'required|min:8',
-        'phone' => 'required|regex:/^\d{10}$/',
-        'address' => 'required|string|max:255',
+        'customer.NIC' => 'required|string|max:20',
+        'customer.name' => 'required|string|max:255',
+        'customer.email' => 'required|email|max:255',
+        'customer.phone' => 'required|string|max:15',
+        'customer.address' => 'required|string|max:255',
     ];
 
-    public function confirmCustomerDeletion( $id ){
+    public function confirmCustomerDeletion($id)
+    {
         $this->confirmingCustomerDeletion = $id;
     }
-    public function deleteCustomer(Customer $customer){
-        dd('dwwwwwwwwwwwww');
+    public function deleteCustomer(Customer $customer)
+    {
         $customer->delete();
         $this->confirmingCustomerDeletion = false;
     }
-    public function cancelDeleteModel(){
+    public function cancelDeleteModel()
+    {
         $this->confirmingCustomerDeletion = false;
     }
-    public function confirmCustomerAddition(){
+    public function confirmCustomerAddition()
+    {
+        $this->reset('customer');
         $this->confirmingCustomerAddition = true;
     }
-    public function cancelAddModel(){
+    public function cancelAddModel()
+    {
         $this->confirmingCustomerAddition = false;
-
     }
-    public function saveCustomer(){
-        // dd('awaa');
+    public function saveCustomer()
+    {
         $this->password = $this->generateRandomPassword();
         $validated = $this->validate($this->rules);
-        Customer::create($validated);
+        $customerData = $validated['customer'];
+        $customerData['password'] = bcrypt($this->password);
+        Customer::create($customerData);
         $this->confirmingCustomerAddition = false;
     }
 
@@ -59,25 +70,22 @@ class Customers extends Component
         return bin2hex(random_bytes($length / 2));
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
-        $customers = Customer::latest()
-            // ->when($this->search, function($query){
-            //     return $query->where(function($query){
-            //         $query->where('name', 'like', '%'.$this->search.'%')
-            //         ->orWhere('email', 'like', '%'.$this->search.'%');
-            //     });
-
-            // })
+        $customers = Customer::query()
+            ->where('email', 'like', "%{$this->search}%")
             ->paginate(2);
 
-            return view('livewire.customers', 
+        return view(
+            'livewire.customers',
             [
-                'customers' => Customer::query()
-                    ->where('email', 'like', "%{$this->search}%")
-                    ->paginate(2)
+                'customers' => $customers
             ]
-            );
+        );
     }
 }

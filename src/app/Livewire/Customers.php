@@ -41,6 +41,8 @@ class Customers extends Component
     {
         $customer->delete();
         $this->confirmingCustomerDeletion = false;
+        session()->flash('message', 'Customer deleted successfully');
+
     }
     public function cancelDeleteModel()
     {
@@ -61,12 +63,14 @@ class Customers extends Component
             $validated = $this->validate($this->rules);
             $customerData = $validated['customer'];
             Customer::where('id', $this->customer['id'])->update($customerData);
+            session()->flash('message', 'Customer updated successfully');
         } else {
             $this->password = $this->generateRandomPassword();
             $validated = $this->validate($this->rules);
             $customerData = $validated['customer'];
             $customerData['password'] = bcrypt($this->password);
             Customer::create($customerData);
+            session()->flash('message', 'New Customer Added successfully');
         }
         $this->confirmingCustomerAddition = false;
     }

@@ -57,12 +57,31 @@ class Customers extends Component
     }
     public function saveCustomer()
     {
-        $this->password = $this->generateRandomPassword();
-        $validated = $this->validate($this->rules);
-        $customerData = $validated['customer'];
-        $customerData['password'] = bcrypt($this->password);
-        Customer::create($customerData);
+        if (isset($this->customer['id'])) {
+            $validated = $this->validate($this->rules);
+            $customerData = $validated['customer'];
+            Customer::where('id', $this->customer['id'])->update($customerData);
+        } else {
+            $this->password = $this->generateRandomPassword();
+            $validated = $this->validate($this->rules);
+            $customerData = $validated['customer'];
+            $customerData['password'] = bcrypt($this->password);
+            Customer::create($customerData);
+        }
         $this->confirmingCustomerAddition = false;
+    }
+
+    public function confirmCustomerEditing(Customer $customer)
+    {
+        $this->customer = [
+            'id' => $customer->id,
+            'NIC' => $customer->NIC,
+            'name' => $customer->name,
+            'email' => $customer->email,
+            'phone' => $customer->phone,
+            'address' => $customer->address,
+        ];
+        $this->confirmingCustomerAddition = true;
     }
 
     protected function generateRandomPassword($length = 8)

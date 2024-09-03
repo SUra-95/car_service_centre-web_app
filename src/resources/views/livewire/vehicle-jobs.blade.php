@@ -18,30 +18,21 @@
         </div>
     @endif
     <div class="mt-8 text-2xl flex justify-between">
-        <div>Cars</div>
+        <div>Vehicle Jobs</div>
         <div class="mr-2">
-            <x-button wire:click="confirmCarAddition" class="!bg-blue-800 hover:!bg-blue-900">
+            {{-- <x-button wire:click="confirmCarAddition" class="!bg-blue-800 hover:!bg-blue-900">
                 {{ __('Add new Car') }}
-            </x-button>
+            </x-button> --}}
         </div>
     </div>
     <div class="mt-6">
         <div class="flex justify-start pb-6">
-            <div class="w-1/4">
-                <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="Search cars"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 h-10 text-gray leading-tight focus:outline-none focus:shadow-outline ">
-            </div>
-            <div>
-                <select id="customer_id" name="car.customer_id"
-                    class="ml-3 block w-full h-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                    wire:model="car.customer_id" wire:change="handleCustomerChange($event.target.value)" required>
-                    <option value="">{{ __('Select a customer') }}</option>
-                    @foreach ($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                    @endforeach
-                </select>
+            <div class="w-full">
+                <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="Search by NIC or email"
+                    class="shadow appearance-none border  rounded w-full py-2 px-3 h-10 text-gray leading-tight focus:outline-none focus:shadow-outline ">
             </div>
         </div>
+        @if($cars->isNotEmpty())
         <table class="table-auto w-full">
             <thead>
                 <tr>
@@ -63,11 +54,10 @@
                     <th class="px-4 py-2">
                         <div class="flex items-center">Action</div>
                     </th>
-                    </th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($cars as $car)
+                @foreach ($cars as $car)
                     <tr>
                         <td class="border px-4 py-2 ">{{ $car->registration_number }}</td>
                         <td class="border px-4 py-2 ">{{ $car->model }}</td>
@@ -76,30 +66,29 @@
                         <td class="border px-4 py-2 ">{{ $car->customer->name }}</td>
                         <td class="border px-4 py-2 ">
                             <x-button wire:click="confirmCarEditing({{ $car->id }})"
-                                class="!bg-slate-700 hover:!bg-slate-800">
-                                {{ __('Edit') }}
+                                class="!bg-blue-800 hover:!bg-blue-900">
+                                {{ __('Initiate a job') }}
                             </x-button>
-                            <x-danger-button wire:click="confirmCarDeletion({{ $car->id }})"
+                            {{-- <x-danger-button wire:click="confirmCarDeletion({{ $car->id }})"
                                 wire:loading.attr="disabled">
                                 {{ __('Delete') }}
-                            </x-danger-button>
+                            </x-danger-button> --}}
                         </td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="border px-4 py-4 text-center">
-                            {{ __('-- No cars found --') }}
-                        </td>
-                    </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
-    </div>
-    <div class="mt-4">
+    @else
+        <div class="px-4 py-4 text-center">
+            {{ __('-- Please search a car by NIC or email of the customer and initiate a service --') }}
+        </div>
+    @endif
+    
+    {{-- <div class="mt-4">
         {{ $cars->links() }}
-    </div>
+    </div> --}}
 
-    <x-confirmation-modal wire:model.live="confirmingCarDeletion">
+    {{-- <x-confirmation-modal wire:model.live="confirmingCarDeletion">
         <x-slot name="title">
             {{ __('Delete Car') }}
         </x-slot>
@@ -116,9 +105,9 @@
                 {{ __('Delete') }}
             </x-danger-button>
         </x-slot>
-    </x-confirmation-modal>
+    </x-confirmation-modal> --}}
 
-    <x-dialog-modal wire:model.live="confirmingCarAddition">
+    {{-- <x-dialog-modal wire:model.live="confirmingCarAddition">
         <x-slot name="title">
             {{ isset($this->car['id']) ? 'Edit Car' : 'Add Car' }}
         </x-slot>
@@ -180,5 +169,5 @@
                 {{ __('Save') }}
             </x-danger-button>
         </x-slot>
-    </x-dialog-modal>
+    </x-dialog-modal> --}}
 </div>

@@ -20,4 +20,7 @@ Route::middleware([
     Route::get('/car', function () {
         return view('car');
     })->name('car');
+    Route::get('/vehicle-jobs', function () {
+        return view('vehicle-jobs');
+    })->name('vehicle-jobs');
 });

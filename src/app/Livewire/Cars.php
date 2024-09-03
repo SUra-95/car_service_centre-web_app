@@ -36,9 +36,9 @@ class Cars extends Component
     ];
 
     public function mount()
-{
-    $this->customers = Customer::all();
-}
+    {
+        $this->customers = Customer::all();
+    }
 
     public function confirmCarDeletion($id)
     {

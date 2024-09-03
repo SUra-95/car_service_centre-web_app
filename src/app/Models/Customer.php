@@ -18,4 +18,8 @@ class Customer extends Model
         'phone',
         'address',
     ];
+
+    public function cars() {
+        return $this->hasMany(Car::class);
+    }
 }

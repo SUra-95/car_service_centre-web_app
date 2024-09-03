@@ -18,4 +18,8 @@ class Car extends Model
         'customer_id',
         'is_deleted',
     ];
+
+    public function customer(){
+        return $this->belongsTo(Customer::class);
+    }
 }

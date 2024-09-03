@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Car;
+use App\Models\Customer;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,6 +15,7 @@ class Cars extends Component
     public $confirmingCarDeletion = false;
     public $confirmingCarAddition = false;
     public $password;
+    public $customers;
     public $car = [
         'registration_number' => '',
         'model' => '',
@@ -26,9 +28,15 @@ class Cars extends Component
     protected $rules = [
         'car.registration_number' => 'required|string|max:20',
         'car.model' => 'required|string|max:255',
-        'car.fuel_type' => 'required|max:255',
+        'car.fuel_type' => 'required|string|max:255',
         'car.transmission' => 'required|string|max:15',
+        'car.customer_id' => 'required|exists:customers,id',
     ];
+
+    public function mount()
+{
+    $this->customers = Customer::all();
+}
 
     public function confirmCarDeletion($id)
     {
@@ -79,6 +87,7 @@ class Cars extends Component
             'model' => $car->model,
             'fuel_type' => $car->fuel_type,
             'transmission' => $car->transmission,
+            'customer_id' => $car->customer_id,
         ];
         $this->confirmingCarAddition = true;
     }
@@ -92,6 +101,7 @@ class Cars extends Component
     {
         $cars = Car::query()
             ->where('model', 'like', "%{$this->search}%")
+            ->orWhere('registration_number', 'like', "%{$this->search}%")
             ->paginate(2);
 
         return view(

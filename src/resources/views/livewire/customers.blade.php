@@ -25,8 +25,8 @@
         </div>
     </div>
     <div class="mt-6">
-        <div class="flex justify-between">
-            <div class="pb-5">
+        <div class="flex justify-between ">
+            <div class="pb-5 w-1/4">
                 <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="Search customers"
                     class="shadow appearance-none border  rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline ">
             </div>
@@ -110,31 +110,31 @@
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="NIC" value="{{ __('NIC') }}" />
                 <x-input id="NIC" name="customer.NIC" type="text" class="mt-1 block w-full"
-                    wire:model="customer.NIC" required />
+                    wire:model="customer.NIC" placeholder="NIC" required />
                 <x-input-error for="customer.NIC" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="name" value="{{ __('Name') }}" />
                 <x-input id="name" name="customer.name" type="text" class="mt-1 block w-full"
-                    wire:model="customer.name" required />
+                wire:model="customer.name" placeholder="Name" required />
                 <x-input-error for="customer.name" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="email" value="{{ __('Email') }}" />
                 <x-input id="email" name="customer.email" type="text" class="mt-1 block w-full"
-                    wire:model="customer.email" required />
+                    wire:model="customer.email" placeholder="Email" required />
                 <x-input-error for="customer.email" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="phone" value="{{ __('Phone') }}" />
                 <x-input id="phone" name="customer.phone" type="text" class="mt-1 block w-full"
-                    wire:model="customer.phone" required />
+                    wire:model="customer.phone" placeholder="Phone" required />
                 <x-input-error for="customer.phone" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
                 <x-label for="address" value="{{ __('Address') }}" />
                 <x-input id="address" name="customer.address" type="text" class="mt-1 block w-full"
-                    wire:model="customer.address" required />
+                    wire:model="customer.address" placeholder="Address" required />
                 <x-input-error for="customer.address" class="mt-2" />
             </div>
         </x-slot>

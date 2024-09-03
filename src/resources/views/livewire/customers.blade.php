@@ -27,7 +27,7 @@
     <div class="mt-6">
         <div class="flex justify-between">
             <div class="pb-5">
-                <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="search"
+                <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="Search customers"
                     class="shadow appearance-none border  rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline ">
             </div>
         </div>

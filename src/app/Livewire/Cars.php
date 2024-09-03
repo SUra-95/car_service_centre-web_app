@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Car;
 use Livewire\Component;
-use App\Models\Customer;
 use Livewire\WithPagination;
 
 class Cars extends Component
@@ -12,15 +11,14 @@ class Cars extends Component
     use WithPagination;
 
     public $search;
-    public $confirmingCustomerDeletion = false;
-    public $confirmingCustomerAddition = false;
+    public $confirmingCarDeletion = false;
+    public $confirmingCarAddition = false;
     public $password;
     public $car = [
         'registration_number' => '',
         'model' => '',
         'fuel_type' => '',
         'transmission' => '',
-        'is_deleted' => 0
     ];
     protected $queryString = [
         'search' => ['except' => '']
@@ -32,29 +30,29 @@ class Cars extends Component
         'car.transmission' => 'required|string|max:15',
     ];
 
-    public function confirmCustomerDeletion($id)
+    public function confirmCarDeletion($id)
     {
-        $this->confirmingCustomerDeletion = $id;
+        $this->confirmingCarDeletion = $id;
     }
-    public function deleteCustomer(Customer $customer)
+    public function deleteCar(Car $car)
     {
-        $customer->delete();
-        $this->confirmingCustomerDeletion = false;
-        session()->flash('message', 'Customer deleted successfully');
+        $car->delete();
+        $this->confirmingCarDeletion = false;
+        session()->flash('message', 'Car deleted successfully');
 
     }
     public function cancelDeleteModel()
     {
-        $this->confirmingCustomerDeletion = false;
+        $this->confirmingCarDeletion = false;
     }
-    public function confirmCustomerAddition()
+    public function confirmCarAddition()
     {
         $this->reset('car');
-        $this->confirmingCustomerAddition = true;
+        $this->confirmingCarAddition = true;
     }
     public function cancelAddModel()
     {
-        $this->confirmingCustomerAddition = false;
+        $this->confirmingCarAddition = false;
     }
     public function saveCar()
     {
@@ -70,10 +68,10 @@ class Cars extends Component
             Car::create($carData);
             session()->flash('message', 'New Car Added successfully');
         }
-        $this->confirmingCustomerAddition = false;
+        $this->confirmingCarAddition = false;
     }
 
-    public function confirmCustomerEditing(Car $car)
+    public function confirmCarEditing(Car $car)
     {
         $this->car = [
             'id' => $car->id,
@@ -82,7 +80,7 @@ class Cars extends Component
             'fuel_type' => $car->fuel_type,
             'transmission' => $car->transmission,
         ];
-        $this->confirmingCustomerAddition = true;
+        $this->confirmingCarAddition = true;
     }
 
     public function updatingSearch()
@@ -92,14 +90,14 @@ class Cars extends Component
 
     public function render()
     {
-        $customers = Car::query()
-            // ->where('email', 'like', "%{$this->search}%")
+        $cars = Car::query()
+            ->where('model', 'like', "%{$this->search}%")
             ->paginate(2);
 
         return view(
             'livewire.cars',
             [
-                'cars' => $customers
+                'cars' => $cars
             ]
         );
     }

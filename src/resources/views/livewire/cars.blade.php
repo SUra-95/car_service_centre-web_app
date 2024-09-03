@@ -19,7 +19,7 @@
     <div class="mt-8 text-2xl flex justify-between">
         <div>Cars</div>
         <div class="mr-2">
-            <x-button wire:click="confirmCustomerAddition" class="!bg-blue-800 hover:!bg-blue-900">
+            <x-button wire:click="confirmCarAddition" class="!bg-blue-800 hover:!bg-blue-900">
                 {{ __('Add new Car') }}
             </x-button>
         </div>
@@ -27,7 +27,7 @@
     <div class="mt-6">
         <div class="flex justify-between">
             <div class="pb-5">
-                <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="search"
+                <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="Search cars"
                     class="shadow appearance-none border  rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline ">
             </div>
         </div>
@@ -60,11 +60,11 @@
                         <td class="border px-4 py-2 ">{{ $car->fuel_type }}</td>
                         <td class="border px-4 py-2 ">{{ $car->transmission }}</td>
                         <td class="border px-4 py-2 ">
-                            <x-button wire:click="confirmCustomerEditing({{ $car->id }})"
+                            <x-button wire:click="confirmCarEditing({{ $car->id }})"
                                 class="!bg-slate-700 hover:!bg-slate-800">
                                 {{ __('Edit') }}
                             </x-button>
-                            <x-danger-button wire:click="confirmCustomerDeletion({{ $car->id }})"
+                            <x-danger-button wire:click="confirmCarDeletion({{ $car->id }})"
                                 wire:loading.attr="disabled">
                                 {{ __('Delete') }}
                             </x-danger-button>
@@ -78,13 +78,13 @@
         {{ $cars->links() }}
     </div>
 
-    <x-confirmation-modal wire:model.live="confirmingCustomerDeletion">
+    <x-confirmation-modal wire:model.live="confirmingCarDeletion">
         <x-slot name="title">
-            {{ __('Delete Customer') }}
+            {{ __('Delete Car') }}
         </x-slot>
 
         <x-slot name="content">
-            {{ __('Are you sure you want to delete this customer?') }}
+            {{ __('Are you sure you want to delete this car?') }}
         </x-slot>
 
         <x-slot name="footer">
@@ -92,7 +92,7 @@
                 {{ __('Cancel') }}
             </x-secondary-button>
 
-            <x-danger-button class="ms-3" wire:click="deleteCustomer({{ $confirmingCustomerDeletion }})"
+            <x-danger-button class="ms-3" wire:click="deleteCar({{ $confirmingCarDeletion }})"
                 wire:loading.attr="disabled">
                 {{ __('Delete') }}
             </x-danger-button>
@@ -100,7 +100,7 @@
     </x-confirmation-modal>
 
 
-    <x-dialog-modal wire:model.live="confirmingCustomerAddition">
+    <x-dialog-modal wire:model.live="confirmingCarAddition">
         <x-slot name="title">
             {{ isset($this->car['id']) ? 'Edit Car' : 'Add Car' }}
         </x-slot>
@@ -108,7 +108,7 @@
 
         <x-slot name="content">
             <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="registration_number" value="{{ __('registration_number') }}" />
+                <x-label for="registration_number" value="{{ __('Registration Number') }}" />
                 <x-input id="registration_number" name="car.registration_number" type="text" class="mt-1 block w-full"
                     wire:model="car.registration_number" required />
                 <x-input-error for="car.registration_number" class="mt-2" />
@@ -120,7 +120,7 @@
                 <x-input-error for="car.model" class="mt-2" />
             </div>
             <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="fuel_type" value="{{ __('Fuel_type') }}" />
+                <x-label for="fuel_type" value="{{ __('Fuel type') }}" />
                 <x-input id="fuel_type" name="car.fuel_type" type="text" class="mt-1 block w-full"
                     wire:model="car.fuel_type" required />
                 <x-input-error for="car.fuel_type" class="mt-2" />

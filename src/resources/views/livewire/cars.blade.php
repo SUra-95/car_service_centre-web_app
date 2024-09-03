@@ -26,10 +26,20 @@
         </div>
     </div>
     <div class="mt-6">
-        <div class="flex justify-between">
-            <div class="pb-5">
+        <div class="flex justify-start pb-6">
+            <div class="">
                 <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="Search cars"
-                    class="shadow appearance-none border  rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline ">
+                    class="shadow appearance-none border  rounded w-full py-2 px-3 h-10 text-gray leading-tight focus:outline-none focus:shadow-outline ">
+            </div>
+            <div>
+                <select id="customer_id" name="car.customer_id"
+                    class="ml-3 block w-full h-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                    wire:model="car.customer_id" wire:change="handleCustomerChange($event.target.value)" required>
+                    <option value="">{{ __('Select a customer') }}</option>
+                    @foreach ($customers as $customer)
+                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
         <table class="table-auto w-full">
@@ -57,7 +67,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($cars as $car)
+                @forelse ($cars as $car)
                     <tr>
                         <td class="border px-4 py-2 ">{{ $car->registration_number }}</td>
                         <td class="border px-4 py-2 ">{{ $car->model }}</td>
@@ -75,7 +85,13 @@
                             </x-danger-button>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="6" class="border px-4 py-4 text-center">
+                            {{ __('-- No cars found --') }}
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

@@ -16,7 +16,9 @@ class Cars extends Component
     public $confirmingCarAddition = false;
     public $password;
     public $customers;
+    public $filter;
     public $car = [
+        'customer_id' => null,
         'registration_number' => '',
         'model' => '',
         'fuel_type' => '',
@@ -26,11 +28,11 @@ class Cars extends Component
         'search' => ['except' => '']
     ];
     protected $rules = [
+        'car.customer_id' => 'required|exists:customers,id',
         'car.registration_number' => 'required|string|max:20',
         'car.model' => 'required|string|max:255',
         'car.fuel_type' => 'required|string|max:255',
         'car.transmission' => 'required|string|max:15',
-        'car.customer_id' => 'required|exists:customers,id',
     ];
 
     public function mount()
@@ -47,7 +49,6 @@ class Cars extends Component
         $car->delete();
         $this->confirmingCarDeletion = false;
         session()->flash('message', 'Car deleted successfully');
-
     }
     public function cancelDeleteModel()
     {
@@ -97,13 +98,25 @@ class Cars extends Component
         $this->resetPage();
     }
 
+    public function handleCustomerChange($customerId)
+    {
+        $this->filter = $customerId;
+    }
+
     public function render()
     {
-        $cars = Car::query()
-            ->where('model', 'like', "%{$this->search}%")
-            ->orWhere('registration_number', 'like', "%{$this->search}%")
-            ->paginate(2);
+        $query = Car::query();
 
+        if ($this->filter) {
+            $query->where('customer_id', $this->filter);
+        }
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('model', 'like', "%{$this->search}%")
+                    ->orWhere('registration_number', 'like', "%{$this->search}%");
+            });
+        }
+        $cars = $query->paginate(4);
         return view(
             'livewire.cars',
             [

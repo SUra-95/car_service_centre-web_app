@@ -10,7 +10,7 @@ class VehicleJobs extends Component
 {
     public $search;
     public $confirmingCarDeletion = false;
-    public $confirmingCarAddition = false;
+    public $confirmingJobAddition = false;
     public $password;
     public $customers;
     // public $cars;
@@ -37,6 +37,12 @@ class VehicleJobs extends Component
     {
         $this->customers = Customer::all();
         // $this->cars = Car::all();
+    }
+
+    public function confirmJobAddition(Car $car)
+    {
+        // dd($car);
+        $this->confirmingJobAddition = true;
     }
 
     public function render()

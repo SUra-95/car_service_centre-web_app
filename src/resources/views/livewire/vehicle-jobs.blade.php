@@ -65,7 +65,7 @@
                         <td class="border px-4 py-2 ">{{ $car->transmission }}</td>
                         <td class="border px-4 py-2 ">{{ $car->customer->name }}</td>
                         <td class="border px-4 py-2 ">
-                            <x-button wire:click="confirmCarEditing({{ $car->id }})"
+                            <x-button wire:click="confirmJobAddition({{ $car->id }})"
                                 class="!bg-blue-800 hover:!bg-blue-900">
                                 {{ __('Initiate a job') }}
                             </x-button>
@@ -107,9 +107,9 @@
         </x-slot>
     </x-confirmation-modal> --}}
 
-    {{-- <x-dialog-modal wire:model.live="confirmingCarAddition">
+    <x-dialog-modal wire:model.live="confirmingJobAddition">
         <x-slot name="title">
-            {{ isset($this->car['id']) ? 'Edit Car' : 'Add Car' }}
+            {{ __('Add vehicle job') }}
         </x-slot>
 
         <x-slot name="content">
@@ -169,5 +169,5 @@
                 {{ __('Save') }}
             </x-danger-button>
         </x-slot>
-    </x-dialog-modal> --}}
+    </x-dialog-modal>
 </div>

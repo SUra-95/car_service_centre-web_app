@@ -45,6 +45,10 @@ class VehicleJobs extends Component
         $this->confirmingJobAddition = true;
     }
 
+    public function cancelJobModel(){
+        $this->confirmingJobAddition = false;
+    }
+
     public function render()
     {
         // Check if there is a search input

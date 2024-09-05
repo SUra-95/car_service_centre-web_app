@@ -22,4 +22,7 @@ class Car extends Model
     public function customer(){
         return $this->belongsTo(Customer::class);
     }
+    public function jobs(){
+        return $this->belongsToMany(VehicleJob::class);
+    }
 }

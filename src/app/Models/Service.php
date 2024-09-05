@@ -15,4 +15,8 @@ class Service extends Model
         'section',
         'price',
     ];
+
+    public function jobs(){
+        return $this->belongsToMany(VehicleJob::class);
+    }
 }

@@ -20,75 +20,75 @@
     <div class="mt-8 text-2xl flex justify-between">
         <div>Vehicle Jobs</div>
         <div class="mr-2">
-            {{-- <x-button wire:click="confirmCarAddition" class="!bg-blue-800 hover:!bg-blue-900">
-                {{ __('Add new Car') }}
+            {{-- <x-button wire:click="confirmJobAddition" class="!bg-blue-800 hover:!bg-blue-900">
+                {{ __('Add new job') }}
             </x-button> --}}
         </div>
     </div>
     <div class="mt-6">
         <div class="flex justify-start pb-6">
             <div class="w-full">
-                <input wire:model.live.debounce.500ms="search" type="text" name="" placeholder="Search by NIC or email"
+                <input wire:model.live.debounce.500ms="search" type="text" name=""
+                    placeholder="Search by NIC or email"
                     class="shadow appearance-none border  rounded w-full py-2 px-3 h-10 text-gray leading-tight focus:outline-none focus:shadow-outline ">
             </div>
         </div>
         @if($cars->isNotEmpty())
-        <table class="table-auto w-full">
-            <thead>
-                <tr>
-                    <th class="px-4 py-2">
-                        <div class="flex items-center">Registration Number</div>
-                    </th>
-                    <th class="px-4 py-2">
-                        <div class="flex items-center">Model</div>
-                    </th>
-                    <th class="px-4 py-2">
-                        <div class="flex items-center">Fuel Type</div>
-                    </th>
-                    <th class="px-4 py-2">
-                        <div class="flex items-center">Transmission</div>
-                    </th>
-                    <th class="px-4 py-2">
-                        <div class="flex items-center">Customer</div>
-                    </th>
-                    <th class="px-4 py-2">
-                        <div class="flex items-center">Action</div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($cars as $car)
+            <table class="table-auto w-full">
+                <thead>
                     <tr>
-                        <td class="border px-4 py-2 ">{{ $car->registration_number }}</td>
-                        <td class="border px-4 py-2 ">{{ $car->model }}</td>
-                        <td class="border px-4 py-2 ">{{ $car->fuel_type }}</td>
-                        <td class="border px-4 py-2 ">{{ $car->transmission }}</td>
-                        <td class="border px-4 py-2 ">{{ $car->customer->name }}</td>
-                        <td class="border px-4 py-2 ">
-                            <x-button wire:click="confirmJobAddition({{ $car->id }})"
-                                class="!bg-blue-800 hover:!bg-blue-900">
-                                {{ __('Initiate a job') }}
-                            </x-button>
-                            {{-- <x-danger-button wire:click="confirmCarDeletion({{ $car->id }})"
+                        <th class="px-4 py-2">
+                            <div class="flex items-center">Registration Number</div>
+                        </th>
+                        <th class="px-4 py-2">
+                            <div class="flex items-center">Model</div>
+                        </th>
+                        <th class="px-4 py-2">
+                            <div class="flex items-center">Fuel Type</div>
+                        </th>
+                        <th class="px-4 py-2">
+                            <div class="flex items-center">Transmission</div>
+                        </th>
+                        <th class="px-4 py-2">
+                            <div class="flex items-center">Customer</div>
+                        </th>
+                        <th class="px-4 py-2">
+                            <div class="flex items-center">Action</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($cars as $car)
+                        <tr>
+                            <td class="border px-4 py-2 ">{{ $car->registration_number }}</td>
+                            <td class="border px-4 py-2 ">{{ $car->model }}</td>
+                            <td class="border px-4 py-2 ">{{ $car->fuel_type }}</td>
+                            <td class="border px-4 py-2 ">{{ $car->transmission }}</td>
+                            <td class="border px-4 py-2 ">{{ $car->customer->name }}</td>
+                            <td class="border px-4 py-2 ">
+                                <x-button wire:click="confirmJobAddition({{ $car->id }})"
+                                    class="!bg-blue-800 hover:!bg-blue-900">
+                                    {{ __('Initiate a job') }}
+                                </x-button>
+                                {{-- <x-danger-button wire:click="confirmCarDeletion({{ $car->id }})"
                                 wire:loading.attr="disabled">
                                 {{ __('Delete') }}
                             </x-danger-button> --}}
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <div class="px-4 py-4 text-center">
-            {{ __('-- Please search a car by NIC or email of the customer and initiate a service --') }}
-        </div>
-    @endif
-    
-    {{-- <div class="mt-4">
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="px-4 py-4 text-center">
+                {{ __('-- Please search a car by NIC or email of the customer and initiate a service --') }}
+            </div>
+        @endif
+        {{-- <div class="mt-4">
         {{ $cars->links() }}
     </div> --}}
 
-    {{-- <x-confirmation-modal wire:model.live="confirmingCarDeletion">
+        {{-- <x-confirmation-modal wire:model.live="confirmingCarDeletion">
         <x-slot name="title">
             {{ __('Delete Car') }}
         </x-slot>
@@ -107,67 +107,90 @@
         </x-slot>
     </x-confirmation-modal> --}}
 
-    <x-dialog-modal wire:model.live="confirmingJobAddition">
-        <x-slot name="title">
-            {{ __('Add vehicle job') }}
-        </x-slot>
+        <x-dialog-modal wire:model.live="confirmingJobAddition">
+            <x-slot name="title">
+                {{ __('Add Vehicle Job') }}
+            </x-slot>
 
-        <x-slot name="content">
-            <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="registration_number" value="{{ __('Registration Number') }}" />
-                <x-input id="registration_number" name="car.registration_number" type="text"
-                    class="mt-1 block w-full" wire:model="car.registration_number" placeholder="Registration Number" required />
-                <x-input-error for="car.registration_number" class="mt-2" />
-            </div>
-            <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="model" value="{{ __('Model') }}" />
-                <x-input id="model" name="car.model" type="text" class="mt-1 block w-full" wire:model="car.model" placeholder="Model Number" required />
-                <x-input-error for="car.model" class="mt-2" />
-            </div>
-            <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="fuel_type" value="{{ __('Fuel Type') }}" />
-                <select id="fuel_type" name="car.fuel_type"
-                    class="mt-1 block w-full  border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                    wire:model="car.fuel_type" required>
-                    <option value="">{{ __('Select Fuel Type') }}</option>
-                    <option value="Petrol">Petrol</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Other">Other</option>
-                </select>
-                <x-input-error for="car.fuel_type" class="mt-2" />
-            </div>
-            <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="transmission" value="{{ __('Transmission') }}" />
-                <select id="transmission" name="car.transmission"
-                    class="mt-1 block w-full  border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                    wire:model="car.transmission" required>
-                    <option value="">{{ __('Select Transmission') }}</option>
-                    <option value="Auto">Auto</option>
-                    <option value="Manual">Manual</option>
-                    <option value="Other">Other</option>
-                </select>
-                <x-input-error for="car.transmission" class="mt-2" />
-            </div>
-            <div class="col-span-6 sm:col-span-4 mt-2">
-                <x-label for="customer_id" value="{{ __('Customer') }}" />
-                <select id="customer_id" name="car.customer_id"
-                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                    wire:model="car.customer_id" required>
-                    <option value="">{{ __('Select a customer') }}</option>
-                    @foreach ($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                    @endforeach
-                </select>
-                <x-input-error for="car.customer_id" class="mt-2" />
-            </div>
-        </x-slot>
-        <x-slot name="footer">
-            <x-secondary-button wire:click="cancelAddModel" wire:loading.attr="disabled">
-                {{ __('Cancel') }}
-            </x-secondary-button>
-            <x-danger-button class="ms-3" wire:click="saveCar" wire:loading.attr="disabled">
-                {{ __('Save') }}
-            </x-danger-button>
-        </x-slot>
-    </x-dialog-modal>
-</div>
+            <x-slot name="content">
+                <!-- Dropdown for Wash Types -->
+                <div class="col-span-6 sm:col-span-4 mt-2">
+                    <x-label for="wash_type" value="{{ __('Wash Type') }}" />
+                    <select id="wash_type" name="car.wash_type"
+                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        wire:model="car.wash_type" required>
+                        <option value="">{{ __('Select Wash Type') }}</option>
+                        <option value="Full Wash">Full Wash</option>
+                        <option value="Body Wash">Body Wash</option>
+                    </select>
+                    <x-input-error for="car.wash_type" class="mt-2" />
+                </div>
+
+                <!-- Dropdown for Interior Cleaning Types -->
+                <div class="col-span-6 sm:col-span-4 mt-2">
+                    <x-label for="interior_cleaning" value="{{ __('Interior Cleaning Type') }}" />
+                    <select id="interior_cleaning" name="car.interior_cleaning"
+                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        wire:model="car.interior_cleaning" required>
+                        <option value="">{{ __('Select Interior Cleaning Type') }}</option>
+                        <option value="Shampoo">Shampoo</option>
+                        <option value="Vacuum">Vacuum</option>
+                    </select>
+                    <x-input-error for="car.interior_cleaning" class="mt-2" />
+                </div>
+
+                <!-- Checkboxes for Car Services -->
+                <div class="col-span-6 sm:col-span-4 mt-2">
+                    <x-label value="{{ __('Select Services') }}" />
+                    <div class="mt-2 space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" value="Engine Oil Replacement" wire:model="selected_services"
+                                class="form-checkbox">
+                            <span class="ml-2">{{ __('Engine Oil Replacement') }}</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="Brake Oil Replacement" wire:model="selected_services"
+                                class="form-checkbox">
+                            <span class="ml-2">{{ __('Brake Oil Replacement') }}</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="Coolant Replacement" wire:model="selected_services"
+                                class="form-checkbox">
+                            <span class="ml-2">{{ __('Coolant Replacement') }}</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="Air Filter Replacement" wire:model="selected_services"
+                                class="form-checkbox">
+                            <span class="ml-2">{{ __('Air Filter Replacement') }}</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="Oil Filter Replacement" wire:model="selected_services"
+                                class="form-checkbox">
+                            <span class="ml-2">{{ __('Oil Filter Replacement') }}</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="AC Filter Replacement" wire:model="selected_services"
+                                class="form-checkbox">
+                            <span class="ml-2">{{ __('AC Filter Replacement') }}</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="Brake Shoe Replacement" wire:model="selected_services"
+                                class="form-checkbox">
+                            <span class="ml-2">{{ __('Brake Shoe Replacement') }}</span>
+                        </label>
+                    </div>
+                    <x-input-error for="selected_services" class="mt-2" />
+                </div>
+            </x-slot>
+
+            <x-slot name="footer">
+                <x-secondary-button wire:click="cancelJobModel" wire:loading.attr="disabled">
+                    {{ __('Cancel') }}
+                </x-secondary-button>
+                <x-danger-button class="ms-3" wire:click="saveJob" wire:loading.attr="disabled">
+                    {{ __('Save') }}
+                </x-danger-button>
+            </x-slot>
+        </x-dialog-modal>
+
+    </div>

@@ -16,4 +16,12 @@ class VehicleJob extends Model
         'service_id',
         'is_deleted',
     ];
+
+    public function cars(){
+        return $this->belongsToMany(Car::class);
+    }
+
+    public function services(){
+        return $this->belongsToMany(Service::class);
+    }
 }

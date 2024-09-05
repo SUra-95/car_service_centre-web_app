@@ -187,7 +187,7 @@
                 <x-secondary-button wire:click="cancelJobModel" wire:loading.attr="disabled">
                     {{ __('Cancel') }}
                 </x-secondary-button>
-                <x-danger-button class="ms-3" wire:click="saveJob" wire:loading.attr="disabled">
+                <x-danger-button class="ms-3" wire:click="saveVehicleJob({{ $car->id }})" wire:loading.attr="disabled">
                     {{ __('Save') }}
                 </x-danger-button>
             </x-slot>

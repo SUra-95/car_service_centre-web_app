@@ -3,8 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\Car;
-use App\Models\Customer;
+use App\Models\Service;
 use Livewire\Component;
+use App\Models\Customer;
+use App\Models\VehicleJob;
 
 class VehicleJobs extends Component
 {
@@ -15,7 +17,12 @@ class VehicleJobs extends Component
     public $customers;
     // public $cars;
     public $filter;
+    public $wash_type;
+    public $interior_type;
+    public $selectedServices = [];
+    public $services;
     public $car = [
+        'id' => '',
         'customer_id' => null,
         'registration_number' => '',
         'model' => '',
@@ -36,16 +43,37 @@ class VehicleJobs extends Component
     public function mount()
     {
         $this->customers = Customer::all();
-        // $this->cars = Car::all();
+        $this->services = Service::all();
     }
 
-    public function confirmJobAddition(Car $car)
+    public function confirmJobAddition()
     {
-        // dd($car);
         $this->confirmingJobAddition = true;
     }
 
     public function cancelJobModel(){
+        $this->confirmingJobAddition = false;
+    }
+    
+    public function saveVehicleJob(Car $car)
+    {
+        dd($car);
+        $this->validate([
+            'wash_type' => 'required',
+            'interior_type' => 'required',
+            'selectedServices' => 'required|array|min:1',
+        ]);
+
+        // Create the new VehicleJob entry
+        $vehicleJob = VehicleJob::create([
+            'car_id' => $car->id,
+            'status' => 'pending',
+        ]);
+
+        // Attach services to the job
+        $vehicleJob->services()->attach($this->selectedServices);
+
+        session()->flash('message', 'Vehicle job added successfully!');
         $this->confirmingJobAddition = false;
     }
 

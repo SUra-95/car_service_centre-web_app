@@ -22,6 +22,7 @@ class VehicleJobs extends Component
     public $selected_services = [];
     public $other_services = [];
     public $services;
+    public $vehicleJobs;
     public $job = [
         'wash_type' => '',
         'interior_cleaning' => '',
@@ -41,7 +42,7 @@ class VehicleJobs extends Component
         $this->services = Service::all();
         $this->washing_services = Service::where('section', 'Washing')->get();
         $this->interior_cleaning_services = Service::where('section', 'Interior Cleaning')->get();
-        $this->other_services = Service::where('section', 'Service')->get();
+        $this->other_services = Service::where('section', 'Service')->get();$this->vehicleJobs = VehicleJob::with('cars')->get();
     }
 
     public function confirmJobAddition()
@@ -137,10 +138,11 @@ class VehicleJobs extends Component
 
         // Paginate the car results
         $cars = $carQuery->paginate(4);
-
+        // $vehicleJobs = VehicleJob::with('car')->get();
         // Return the view with the cars data
         return view('livewire.vehicle-jobs', [
-            'cars' => $cars
+            'cars' => $cars,
+            'vehicleJobs' => $this->vehicleJobs,
         ]);
     }
 }

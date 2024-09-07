@@ -33,7 +33,7 @@
                     class="shadow appearance-none border  rounded w-full py-2 px-3 h-10 text-gray leading-tight focus:outline-none focus:shadow-outline ">
             </div>
         </div>
-        @if($cars->isNotEmpty())
+        @if ($cars->isNotEmpty())
             <table class="table-auto w-full">
                 <thead>
                     <tr>
@@ -58,7 +58,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($cars as $car)
+                    @forelse($cars as $car)
                         <tr>
                             <td class="border px-4 py-2 ">{{ $car->registration_number }}</td>
                             <td class="border px-4 py-2 ">{{ $car->model }}</td>
@@ -76,9 +76,76 @@
                             </x-danger-button> --}}
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="6" class="border px-4 py-4 text-center">
+                                {{ __('-- No cars found --') }}
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
+            <x-dialog-modal wire:model.live="confirmingJobAddition">
+                <x-slot name="title">
+                    {{ __('Add Vehicle Job') }}
+                </x-slot>
+
+                <x-slot name="content">
+                    <!-- Dropdown for Wash Types -->
+                    <div class="col-span-6 sm:col-span-4 mt-2">
+                        <x-label for="wash_type" value="{{ __('Wash Type') }}" />
+                        <select id="wash_type" name="job.wash_type"
+                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            wire:model="job.wash_type" required>
+                            <option value="">{{ __('Select Wash Type') }}</option>
+                            @foreach ($washing_services as $service)
+                                <option value="{{ $service->name }}">{{ $service->name }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error for="job.wash_type" class="mt-2" />
+                    </div>
+
+                    <!-- Dropdown for Interior Cleaning Types -->
+                    <div class="col-span-6 sm:col-span-4 mt-2">
+                        <x-label for="interior_cleaning" value="{{ __('Interior Cleaning Type') }}" />
+                        <select id="interior_cleaning" name="job.interior_cleaning"
+                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            wire:model="job.interior_cleaning" required>
+                            <option value="">{{ __('Select Interior Cleaning Type') }}</option>
+                            @foreach ($interior_cleaning_services as $service)
+                                <option value="{{ $service->name }}">{{ $service->name }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error for="job.interior_cleaning" class="mt-2" />
+                    </div>
+
+                    <!-- Checkboxes for Other Services -->
+                    <div class="col-span-6 sm:col-span-4 mt-2">
+                        <x-label value="{{ __('Select Services') }}" />
+                        <div class="mt-2 space-y-2">
+                            @foreach ($other_services as $service)
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="{{ $service->id }}" wire:model="selected_services"
+                                        class="form-checkbox">
+                                    <span class="ml-2">{{ $service->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <x-input-error for="selected_services" class="mt-2" />
+                    </div>
+                </x-slot>
+
+
+                <x-slot name="footer">
+                    <x-secondary-button wire:click="cancelJobModel" wire:loading.attr="disabled">
+                        {{ __('Cancel') }}
+                    </x-secondary-button>
+                    <x-danger-button class="ms-3" wire:click="saveVehicleJob({{ $car->id }})"
+                        wire:loading.attr="disabled">
+                        {{ __('Save') }}
+                    </x-danger-button>
+                </x-slot>
+            </x-dialog-modal>
         @else
             <div class="px-4 py-4 text-center">
                 {{ __('-- Please search a car by NIC or email of the customer and initiate a service --') }}
@@ -107,62 +174,6 @@
         </x-slot>
     </x-confirmation-modal> --}}
 
-        <x-dialog-modal wire:model.live="confirmingJobAddition">
-            <x-slot name="title">
-                {{ __('Add Vehicle Job') }}
-            </x-slot>
 
-            <x-slot name="content">
-                <!-- Dropdown for Wash Types -->
-                <div class="col-span-6 sm:col-span-4 mt-2">
-                    <x-label for="wash_type" value="{{ __('Wash Type') }}" />
-                    <select id="wash_type" name="job.wash_type"
-                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        wire:model="job.wash_type" required>
-                        <option value="">{{ __('Select Wash Type') }}</option>
-                        <option value="Full Wash">Full Wash</option>
-                        <option value="Body Wash">Body Wash</option>
-                    </select>
-                    <x-input-error for="job.wash_type" class="mt-2" />
-                </div>
-
-                <!-- Dropdown for Interior Cleaning Types -->
-                <div class="col-span-6 sm:col-span-4 mt-2">
-                    <x-label for="interior_cleaning" value="{{ __('Interior Cleaning Type') }}" />
-                    <select id="interior_cleaning" name="job.interior_cleaning"
-                        class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        wire:model="job.interior_cleaning" required>
-                        <option value="">{{ __('Select Interior Cleaning Type') }}</option>
-                        <option value="Shampoo">Shampoo</option>
-                        <option value="Vacuum">Vacuum</option>
-                    </select>
-                    <x-input-error for="job.interior_cleaning" class="mt-2" />
-                </div>
-
-                <!-- Checkboxes for Job Services -->
-                <div class="col-span-6 sm:col-span-4 mt-2">
-                    <x-label value="{{ __('Select Services') }}" />
-                    <div class="mt-2 space-y-2">
-                        @foreach ($services as $service)
-                            <label class="flex items-center">
-                                <input type="checkbox" value="{{ $service->id }}" wire:model="selected_services"
-                                    class="form-checkbox">
-                                <span class="ml-2">{{ $service->name }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-                    <x-input-error for="selected_services" class="mt-2" />
-                </div>
-            </x-slot>
-
-            <x-slot name="footer">
-                <x-secondary-button wire:click="cancelJobModel" wire:loading.attr="disabled">
-                    {{ __('Cancel') }}
-                </x-secondary-button>
-                <x-danger-button class="ms-3" wire:click="saveVehicleJob({{ $car->id }})" wire:loading.attr="disabled">
-                    {{ __('Save') }}
-                </x-danger-button>
-            </x-slot>
-        </x-dialog-modal>
 
     </div>

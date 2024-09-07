@@ -9,16 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('service_vehicle_job', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vehicle_job_id')->constrained()->onDelete('cascade');
             $table->foreignId('service_id')->constrained()->onDelete('cascade');
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }
-    
 
     /**
      * Reverse the migrations.

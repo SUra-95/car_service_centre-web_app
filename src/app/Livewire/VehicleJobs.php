@@ -17,14 +17,14 @@ class VehicleJobs extends Component
     public $customers;
     // public $cars;
     public $filter;
-    public $wash_type;
-    public $interior_type;
+    public $washing_services = [];
+    public $interior_cleaning_services = [];
     public $selected_services = [];
+    public $other_services = [];
     public $services;
     public $job = [
         'wash_type' => '',
         'interior_cleaning' => '',
-        'selected_services' => '',
     ];
     protected $queryString = [
         'search' => ['except' => '']
@@ -39,6 +39,9 @@ class VehicleJobs extends Component
     {
         $this->customers = Customer::all();
         $this->services = Service::all();
+        $this->washing_services = Service::where('section', 'Washing')->get();
+        $this->interior_cleaning_services = Service::where('section', 'Interior Cleaning')->get();
+        $this->other_services = Service::where('section', 'Service')->get();
     }
 
     public function confirmJobAddition()
@@ -64,14 +67,23 @@ class VehicleJobs extends Component
         $vehicleJob = VehicleJob::create([
             'status' => 'pending',
             'car_id' => $carId,
-            // 'wash_type' => $this->job['wash_type'],
-            // 'interior_cleaning_type' => $this->job['interior_cleaning'],
             'is_deleted' => 0,
         ]);
 
-        // Attach the selected services to the VehicleJob through the pivot table
-        if ($this->selected_services && is_array($this->selected_services)) {
+        // Save selected services from checkboxes
+        if ($this->selected_services) {
             $vehicleJob->services()->attach($this->selected_services);
+        }
+
+        // Save washing and interior cleaning selections
+        if ($this->job['wash_type']) {
+            $washService = Service::where('name', $this->job['wash_type'])->first();
+            $vehicleJob->services()->attach($washService->id);
+        }
+
+        if ($this->job['interior_cleaning']) {
+            $interiorService = Service::where('name', $this->job['interior_cleaning'])->first();
+            $vehicleJob->services()->attach($interiorService->id);
         }
 
         // Reset the form fields

@@ -13,12 +13,11 @@ class VehicleJob extends Model
     protected $fillable = [
         'status',
         'car_id',
-        'service_id',
         'is_deleted',
     ];
 
     public function cars(){
-        return $this->belongsToMany(Car::class);
+        return $this->belongsTo(Car::class);
     }
 
     public function services(){

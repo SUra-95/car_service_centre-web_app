@@ -46,31 +46,45 @@ class VehicleJobs extends Component
         $this->confirmingJobAddition = true;
     }
 
-    public function cancelJobModel(){
+    public function cancelJobModel()
+    {
         $this->confirmingJobAddition = false;
     }
 
     public function saveVehicleJob($carId)
     {
-        // Create the new VehicleJob record
+        // Validate inputs
+        $this->validate([
+            'job.wash_type' => 'required',
+            'job.interior_cleaning' => 'required',
+            'selected_services' => 'required|array|min:1',
+        ]);
+
+        // Create the new VehicleJob record without the services
         $vehicleJob = VehicleJob::create([
             'status' => 'pending',
             'car_id' => $carId,
-            'service_id' => 4,
+            // 'wash_type' => $this->job['wash_type'],
+            // 'interior_cleaning_type' => $this->job['interior_cleaning'],
             'is_deleted' => 0,
         ]);
 
-        // Attach the selected services to the VehicleJob
-        $vehicleJob->services()->attach($this->selected_services);
+        // Attach the selected services to the VehicleJob through the pivot table
+        if ($this->selected_services && is_array($this->selected_services)) {
+            $vehicleJob->services()->attach($this->selected_services);
+        }
 
-        // Optionally, reset the form fields
+        // Reset the form fields
         $this->reset(['job', 'selected_services', 'confirmingJobAddition']);
 
         // Flash success message or emit event
         session()->flash('message', 'Vehicle job created successfully!');
 
+        // Close the modal
         $this->confirmingJobAddition = false;
     }
+
+
 
     public function render()
     {

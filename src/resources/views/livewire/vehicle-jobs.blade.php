@@ -143,41 +143,13 @@
                 <div class="col-span-6 sm:col-span-4 mt-2">
                     <x-label value="{{ __('Select Services') }}" />
                     <div class="mt-2 space-y-2">
-                        <label class="flex items-center">
-                            <input type="checkbox" value="Engine Oil Replacement" wire:model="selected_services"
-                                class="form-checkbox">
-                            <span class="ml-2">{{ __('Engine Oil Replacement') }}</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" value="Brake Oil Replacement" wire:model="selected_services"
-                                class="form-checkbox">
-                            <span class="ml-2">{{ __('Brake Oil Replacement') }}</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" value="Coolant Replacement" wire:model="selected_services"
-                                class="form-checkbox">
-                            <span class="ml-2">{{ __('Coolant Replacement') }}</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" value="Air Filter Replacement" wire:model="selected_services"
-                                class="form-checkbox">
-                            <span class="ml-2">{{ __('Air Filter Replacement') }}</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" value="Oil Filter Replacement" wire:model="selected_services"
-                                class="form-checkbox">
-                            <span class="ml-2">{{ __('Oil Filter Replacement') }}</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" value="AC Filter Replacement" wire:model="selected_services"
-                                class="form-checkbox">
-                            <span class="ml-2">{{ __('AC Filter Replacement') }}</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" value="Brake Shoe Replacement" wire:model="selected_services"
-                                class="form-checkbox">
-                            <span class="ml-2">{{ __('Brake Shoe Replacement') }}</span>
-                        </label>
+                        @foreach ($services as $service)
+                            <label class="flex items-center">
+                                <input type="checkbox" value="{{ $service->id }}" wire:model="selected_services"
+                                    class="form-checkbox">
+                                <span class="ml-2">{{ $service->name }}</span>
+                            </label>
+                        @endforeach
                     </div>
                     <x-input-error for="selected_services" class="mt-2" />
                 </div>

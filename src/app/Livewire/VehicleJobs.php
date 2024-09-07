@@ -13,6 +13,7 @@ class VehicleJobs extends Component
     public $search;
     public $confirmingCarDeletion = false;
     public $confirmingJobAddition = false;
+    public $confirmingJobView = false;
     public $password;
     public $customers;
     // public $cars;
@@ -22,7 +23,10 @@ class VehicleJobs extends Component
     public $selected_services = [];
     public $other_services = [];
     public $services;
+    public $jobServices;
     public $vehicleJobs;
+    public $vehicleJob;
+    public $servicesWithStatus = [];
     public $job = [
         'wash_type' => '',
         'interior_cleaning' => '',
@@ -42,7 +46,8 @@ class VehicleJobs extends Component
         $this->services = Service::all();
         $this->washing_services = Service::where('section', 'Washing')->get();
         $this->interior_cleaning_services = Service::where('section', 'Interior Cleaning')->get();
-        $this->other_services = Service::where('section', 'Service')->get();$this->vehicleJobs = VehicleJob::with('cars')->get();
+        $this->other_services = Service::where('section', 'Service')->get();
+        $this->vehicleJobs = VehicleJob::with('cars')->get();
     }
 
     public function confirmJobAddition()
@@ -50,9 +55,25 @@ class VehicleJobs extends Component
         $this->confirmingJobAddition = true;
     }
 
+    public function confirmJobView(VehicleJob $vehicleJob)
+    {
+        // $vehicleJobId = $vehicleJob->id;
+        // dd($vehicleJobId);
+
+        // Retrieve the services associated with this VehicleJob using the pivot table
+        $this->jobServices = $vehicleJob->services()->withPivot('status')->get(); // Fetch related services
+        // dd($this->jobServices);
+        $this->confirmingJobView = true;
+    }
+
     public function cancelJobModel()
     {
         $this->confirmingJobAddition = false;
+    }
+
+    public function cancelJobView()
+    {
+        $this->confirmingJobView = false;
     }
 
     public function saveVehicleJob($carId)

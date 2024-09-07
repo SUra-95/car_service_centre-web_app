@@ -20,7 +20,9 @@ class VehicleJob extends Model
         return $this->belongsTo( Car::class, 'car_id');
     }
 
-    public function services(){
-        return $this->belongsToMany(Service::class);
+    public function services()
+    {
+        return $this->belongsToMany(Service::class)->withPivot('status');
     }
+    
 }

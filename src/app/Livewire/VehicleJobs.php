@@ -19,25 +19,20 @@ class VehicleJobs extends Component
     public $filter;
     public $wash_type;
     public $interior_type;
-    public $selectedServices = [];
+    public $selected_services = [];
     public $services;
-    public $car = [
-        'id' => '',
-        'customer_id' => null,
-        'registration_number' => '',
-        'model' => '',
-        'fuel_type' => '',
-        'transmission' => '',
+    public $job = [
+        'wash_type' => '',
+        'interior_cleaning' => '',
+        'selected_services' => '',
     ];
     protected $queryString = [
         'search' => ['except' => '']
     ];
     protected $rules = [
-        'car.customer_id' => 'required|exists:customers,id',
-        'car.registration_number' => 'required|string|max:20',
-        'car.model' => 'required|string|max:255',
-        'car.fuel_type' => 'required|string|max:255',
-        'car.transmission' => 'required|string|max:15',
+        'job.wash_type' => 'required|string',
+        'job.interior_cleaning' => 'required|string',
+        'selected_services' => 'required|array|min:1',
     ];
 
     public function mount()
@@ -54,26 +49,26 @@ class VehicleJobs extends Component
     public function cancelJobModel(){
         $this->confirmingJobAddition = false;
     }
-    
-    public function saveVehicleJob(Car $car)
+
+    public function saveVehicleJob($carId)
     {
-        dd($car);
-        $this->validate([
-            'wash_type' => 'required',
-            'interior_type' => 'required',
-            'selectedServices' => 'required|array|min:1',
-        ]);
-
-        // Create the new VehicleJob entry
+        // Create the new VehicleJob record
         $vehicleJob = VehicleJob::create([
-            'car_id' => $car->id,
             'status' => 'pending',
+            'car_id' => $carId,
+            'service_id' => 4,
+            'is_deleted' => 0,
         ]);
 
-        // Attach services to the job
-        $vehicleJob->services()->attach($this->selectedServices);
+        // Attach the selected services to the VehicleJob
+        $vehicleJob->services()->attach($this->selected_services);
 
-        session()->flash('message', 'Vehicle job added successfully!');
+        // Optionally, reset the form fields
+        $this->reset(['job', 'selected_services', 'confirmingJobAddition']);
+
+        // Flash success message or emit event
+        session()->flash('message', 'Vehicle job created successfully!');
+
         $this->confirmingJobAddition = false;
     }
 

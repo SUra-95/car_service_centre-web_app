@@ -116,30 +116,30 @@
                 <!-- Dropdown for Wash Types -->
                 <div class="col-span-6 sm:col-span-4 mt-2">
                     <x-label for="wash_type" value="{{ __('Wash Type') }}" />
-                    <select id="wash_type" name="car.wash_type"
+                    <select id="wash_type" name="job.wash_type"
                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        wire:model="car.wash_type" required>
+                        wire:model="job.wash_type" required>
                         <option value="">{{ __('Select Wash Type') }}</option>
                         <option value="Full Wash">Full Wash</option>
                         <option value="Body Wash">Body Wash</option>
                     </select>
-                    <x-input-error for="car.wash_type" class="mt-2" />
+                    <x-input-error for="job.wash_type" class="mt-2" />
                 </div>
 
                 <!-- Dropdown for Interior Cleaning Types -->
                 <div class="col-span-6 sm:col-span-4 mt-2">
                     <x-label for="interior_cleaning" value="{{ __('Interior Cleaning Type') }}" />
-                    <select id="interior_cleaning" name="car.interior_cleaning"
+                    <select id="interior_cleaning" name="job.interior_cleaning"
                         class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        wire:model="car.interior_cleaning" required>
+                        wire:model="job.interior_cleaning" required>
                         <option value="">{{ __('Select Interior Cleaning Type') }}</option>
                         <option value="Shampoo">Shampoo</option>
                         <option value="Vacuum">Vacuum</option>
                     </select>
-                    <x-input-error for="car.interior_cleaning" class="mt-2" />
+                    <x-input-error for="job.interior_cleaning" class="mt-2" />
                 </div>
 
-                <!-- Checkboxes for Car Services -->
+                <!-- Checkboxes for Job Services -->
                 <div class="col-span-6 sm:col-span-4 mt-2">
                     <x-label value="{{ __('Select Services') }}" />
                     <div class="mt-2 space-y-2">

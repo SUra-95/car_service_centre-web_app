@@ -27,6 +27,7 @@ class VehicleJobs extends Component
     public $vehicleJobs;
     public $vehicleJob;
     public $servicesWithStatus = [];
+    public $serviceStatuses = [];
     public $job = [
         'wash_type' => '',
         'interior_cleaning' => '',
@@ -63,6 +64,12 @@ class VehicleJobs extends Component
         // Retrieve the services associated with this VehicleJob using the pivot table
         $this->jobServices = $vehicleJob->services()->withPivot('status')->get(); // Fetch related services
         // dd($this->jobServices);
+        
+        $this->vehicleJob = $vehicleJob;
+        foreach ($this->jobServices as $service) {
+            $this->serviceStatuses[$service->id] = $service->pivot->status;
+        }
+        
         $this->confirmingJobView = true;
     }
 
@@ -118,7 +125,27 @@ class VehicleJobs extends Component
         $this->confirmingJobAddition = false;
     }
 
-
+    public function updateJobServiceStatuses()
+    {
+        // Check if vehicleJob is set
+        if (!$this->vehicleJob) {
+            session()->flash('error', 'Vehicle Job not found.');
+            return;
+        }
+    
+        // Loop through each service's status and update the pivot table
+        foreach ($this->serviceStatuses as $serviceId => $status) {
+            // Update the pivot table with the new status
+            $this->vehicleJob->services()->updateExistingPivot($serviceId, ['status' => $status]);
+        }
+    
+        // Flash a success message
+        session()->flash('message', 'Service statuses updated successfully.');
+    
+        // Close the modal or reset data if needed
+        $this->cancelJobView();
+    }
+    
 
     public function render()
     {

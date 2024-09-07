@@ -203,7 +203,7 @@
                             <td class="border px-4 py-2 ">
                                 @if ($job->status === 'pending')
                                     <span
-                                        class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-400 text-white">
+                                        class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-orange-400 text-white">
                                         {{ __('Pending') }}
                                     </span>
                                 @elseif($job->status === 'completed')
@@ -225,7 +225,7 @@
 
             </table>
             @if ($confirmingJobView)
-            <x-dialog-modal wire:model.live="confirmingJobView">
+                <x-dialog-modal wire:model="confirmingJobView">
                     <x-slot name="title">
                         {{ __('View Vehicle Job') }}
                     </x-slot>
@@ -233,8 +233,6 @@
                     <x-slot name="content">
                         <!-- Modal or section to display services -->
                         <div class="mt-4">
-                            {{-- <h3 class="text-lg font-medium text-gray-900">Services for Job #{{ $vehicleJob->id }}</h3> --}}
-
                             <table class="table-auto w-full mt-6">
                                 <thead>
                                     <tr>
@@ -247,7 +245,20 @@
                                     @foreach ($jobServices as $service)
                                         <tr>
                                             <td class="border px-4 py-2">{{ $service->name }}</td>
-                                            <td class="border px-4 py-2">{{ $service->pivot->status }}</td>
+                                            <td class="border px-4 py-2">
+                                                @if ($service->pivot->status === 'pending')
+                                                    <span
+                                                        class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-orange-400 text-white">
+                                                        {{ __('Pending') }}
+                                                    </span>
+                                                @elseif($service->pivot->status === 'completed')
+                                                    <span
+                                                        class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-green-400 text-white">
+                                                        {{ __('Completed') }}
+                                                    </span>
+                                                @endif
+                                            </td>
+
                                             <td class="border px-4 py-2">
                                                 <select wire:model="serviceStatuses.{{ $service->id }}"
                                                     class="rounded-lg text-sm">
@@ -260,16 +271,15 @@
                                 </tbody>
                             </table>
                         </div>
-
                     </x-slot>
-
 
                     <x-slot name="footer">
                         <x-secondary-button wire:click="cancelJobView" wire:loading.attr="disabled">
                             {{ __('Cancel') }}
                         </x-secondary-button>
-                        <x-danger-button class="ms-3" wire:click="" wire:loading.attr="disabled">
-                            {{ __('Save') }}
+                        <x-danger-button class="ms-3" wire:click="updateJobServiceStatuses"
+                            wire:loading.attr="disabled">
+                            {{ __('Update') }}
                         </x-danger-button>
                     </x-slot>
                 </x-dialog-modal>

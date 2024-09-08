@@ -188,6 +188,7 @@
                             <div class="flex items-center">Status</div>
                         </th>
                         <th class="px-4 py-2 text-sm">Completed Percentage</th>
+                        <th class="px-4 py-2 text-sm">Estimate Finish Time</th>
                         <th class="px-4 py-2">
                             <div class="flex items-center">Action</div>
                         </th>

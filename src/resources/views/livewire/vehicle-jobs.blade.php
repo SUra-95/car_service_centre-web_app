@@ -175,55 +175,75 @@
     </x-confirmation-modal> --}}
 
         @if ($vehicleJobs->isNotEmpty())
-            <table class="table-auto w-full mt-6">
-                <thead>
+        <table class="table-auto w-full mt-6">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">
+                        <div class="flex items-center">Job Number</div>
+                    </th>
+                    <th class="px-4 py-2">
+                        <div class="flex items-center">Car Registration Number/ Model</div>
+                    </th>
+                    <th class="px-4 py-2">
+                        <div class="flex items-center">Status</div>
+                    </th>
+                    <th class="px-4 py-2 text-sm">Progress Percentage</th>
+                    <th class="px-4 py-2">
+                        <div class="flex items-center">Action</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($vehicleJobs as $job)
                     <tr>
-                        <th class="px-4 py-2">
-                            <div class="flex items-center">Job Number</div>
-                        </th>
-                        <th class="px-4 py-2">
-                            <div class="flex items-center">Car Registration Number/ Model</div>
-                        </th>
-                        <th class="px-4 py-2">
-                            <div class="flex items-center">Status</div>
-                        </th>
-                        <th class="px-4 py-2">
-                            <div class="flex items-center">Action</div>
-                        </th>
+                        <td class="border px-4 py-2 ">{{ $job->id }}</td>
+                        <td class="border px-4 py-2 ">
+                            {{ $job->cars->registration_number }} /
+                            {{ $job->cars->model }}
+                        </td>
+                        <td class="border px-4 py-2 ">
+                            @if ($job->status === 'pending')
+                                <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-orange-400 text-white">
+                                    {{ __('Pending') }}
+                                </span>
+                            @elseif($job->status === 'completed')
+                                <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-green-400 text-white">
+                                    {{ __('Completed') }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="border px-4 py-2">
+                            {{-- Retrieve corresponding completedVehicleJob based on job ID --}}
+                            @php
+                                $completedJob = $completedVehicleJobs->firstWhere('id', $job->id);
+                            @endphp
+                            <span 
+                            class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-white 
+                            @if ($completedJob->completionPercentage < 50)
+                                bg-red-500
+                            @elseif ($completedJob->completionPercentage < 75)
+                                bg-amber-400
+                            @elseif ($completedJob->completionPercentage < 100)
+                                bg-lime-400
+                            @else
+                                bg-green-500
+                            @endif
+                            ">
+                            {{ $completedJob->completionPercentage }} %
+                        </span>
+                        
+                        </td>
+                        <td class="border px-4 py-2 ">
+                            <x-button wire:click="confirmJobView({{ $job->id }})"
+                                class="!bg-black-500 hover:!bg-balck-800">
+                                {{ __('View details') }}
+                            </x-button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($vehicleJobs as $job)
-                        <tr>
-                            <td class="border px-4 py-2 ">{{ $job->id }}</td>
-                            <td class="border px-4 py-2 ">
-                                {{ $job->cars->registration_number }} /
-                                {{ $job->cars->model }}
-                            </td>
-                            <td class="border px-4 py-2 ">
-                                @if ($job->status === 'pending')
-                                    <span
-                                        class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-orange-400 text-white">
-                                        {{ __('Pending') }}
-                                    </span>
-                                @elseif($job->status === 'completed')
-                                    <span
-                                        class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-green-400 text-white">
-                                        {{ __('Completed') }}
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="border px-4 py-2 ">
-                                <x-button wire:click="confirmJobView({{ $job->id }})"
-                                    class="!bg-yellow-500 hover:!bg-yellow-600">
-                                    {{ __('View details') }}
-                                </x-button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-
-            </table>
+                @endforeach
+            </tbody>
+        </table>
+        
             @if ($confirmingJobView)
                 <x-dialog-modal wire:model="confirmingJobView">
                     <x-slot name="title">

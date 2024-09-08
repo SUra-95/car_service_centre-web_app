@@ -28,6 +28,8 @@ class VehicleJobs extends Component
     public $vehicleJob;
     public $servicesWithStatus = [];
     public $serviceStatuses = [];
+    public $vehicleJobsCount;
+    public $completedVehicleJobs = [];
     public $job = [
         'wash_type' => '',
         'interior_cleaning' => '',
@@ -49,6 +51,8 @@ class VehicleJobs extends Component
         $this->interior_cleaning_services = Service::where('section', 'Interior Cleaning')->get();
         $this->other_services = Service::where('section', 'Service')->get();
         $this->vehicleJobs = VehicleJob::with('cars')->get();
+        $this->vehicleJobsCount = VehicleJob::withCount('services')->get();
+        $this->getVehicleJobs();
     }
 
     public function confirmJobAddition()
@@ -58,18 +62,15 @@ class VehicleJobs extends Component
 
     public function confirmJobView(VehicleJob $vehicleJob)
     {
-        // $vehicleJobId = $vehicleJob->id;
-        // dd($vehicleJobId);
 
         // Retrieve the services associated with this VehicleJob using the pivot table
         $this->jobServices = $vehicleJob->services()->withPivot('status')->get(); // Fetch related services
-        // dd($this->jobServices);
-        
+
         $this->vehicleJob = $vehicleJob;
         foreach ($this->jobServices as $service) {
             $this->serviceStatuses[$service->id] = $service->pivot->status;
         }
-        
+
         $this->confirmingJobView = true;
     }
 
@@ -132,20 +133,46 @@ class VehicleJobs extends Component
             session()->flash('error', 'Vehicle Job not found.');
             return;
         }
-    
+
         // Loop through each service's status and update the pivot table
         foreach ($this->serviceStatuses as $serviceId => $status) {
             // Update the pivot table with the new status
             $this->vehicleJob->services()->updateExistingPivot($serviceId, ['status' => $status]);
         }
-    
+
         // Flash a success message
         session()->flash('message', 'Service statuses updated successfully.');
-    
+
         // Close the modal or reset data if needed
         $this->cancelJobView();
     }
+
+    public function loadVehicleJobs()
+    {
+        $this->vehicleJobsCount = VehicleJob::withCount('services')->get();
+        dd($this->vehicleJobsCount);
+    }
+
+    public function getVehicleJobs()
+    {
+        $this->completedVehicleJobs = VehicleJob::with('services')->get()->map(function ($job) {
+            // Total services for the job
+            $totalServices = $job->services->count();
     
+            // Completed services for the job
+            $completedServices = $job->services->where('pivot.status', 'completed')->count();
+    
+            // Calculate the completion percentage
+            $completionPercentage = $totalServices > 0 ? ($completedServices / $totalServices) * 100 : 0;
+    
+            $job->totalServices = $totalServices;
+            $job->completedServices = $completedServices;
+            $job->completionPercentage = $completionPercentage;
+            return $job;
+        });
+
+        return view('vehicle-jobs', ['completedVehicleJobs' => $this->completedVehicleJobs]);
+    }
 
     public function render()
     {
@@ -186,11 +213,11 @@ class VehicleJobs extends Component
 
         // Paginate the car results
         $cars = $carQuery->paginate(4);
-        // $vehicleJobs = VehicleJob::with('car')->get();
         // Return the view with the cars data
         return view('livewire.vehicle-jobs', [
             'cars' => $cars,
             'vehicleJobs' => $this->vehicleJobs,
+            'completedVehicleJobs' => $this->completedVehicleJobs,
         ]);
     }
 }

@@ -16,13 +16,18 @@ class VehicleJob extends Model
         'is_deleted',
     ];
 
-    public function cars(){
-        return $this->belongsTo( Car::class, 'car_id');
+    public function cars()
+    {
+        return $this->belongsTo(Car::class, 'car_id');
     }
 
     public function services()
     {
         return $this->belongsToMany(Service::class)->withPivot('status');
     }
-    
+
+    public function serviceCount()
+    {
+        return $this->belongsToMany(Service::class)->count();
+    }
 }

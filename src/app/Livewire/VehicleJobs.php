@@ -7,7 +7,9 @@ use App\Models\Service;
 use Livewire\Component;
 use App\Models\Customer;
 use App\Models\VehicleJob;
+use App\Mail\JobCompletedMail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class VehicleJobs extends Component
 {
@@ -166,6 +168,16 @@ class VehicleJobs extends Component
         if (!$hasPendingServices) {
             // Update the vehicle_jobs table to mark it as 'completed' or another appropriate status
             $this->vehicleJob->update(['status' => 'completed']);
+
+            $carId = $this->vehicleJob->car_id;
+            $car = Car::find($carId);
+            $customer = Customer::find($car->customer_id);
+
+            if ($customer && $customer->email) {
+                Mail::to($customer->email)->send(new JobCompletedMail($this->vehicleJob, $customer));
+            }
+
+            session()->flash('message', 'Service completed email sent successfully.');
         } else {
             // Update the vehicle_jobs table to mark it as 'pending' or retain current status
             $this->vehicleJob->update(['status' => 'pending']);

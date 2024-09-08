@@ -7,6 +7,7 @@ use App\Models\Service;
 use Livewire\Component;
 use App\Models\Customer;
 use App\Models\VehicleJob;
+use Illuminate\Support\Facades\DB;
 
 class VehicleJobs extends Component
 {
@@ -93,39 +94,53 @@ class VehicleJobs extends Component
             'selected_services' => 'required|array|min:1',
         ]);
 
-        // Create the new VehicleJob record without the services
-        $vehicleJob = VehicleJob::create([
-            'status' => 'pending',
-            'car_id' => $carId,
-            'is_deleted' => 0,
-        ]);
+        DB::beginTransaction(); // Start the transaction
 
-        // Save selected services from checkboxes
-        if ($this->selected_services) {
-            $vehicleJob->services()->attach($this->selected_services);
+        try {
+            // Create the new VehicleJob record
+            $vehicleJob = VehicleJob::create([
+                'status' => 'pending',
+                'car_id' => $carId,
+                'is_deleted' => 0,
+            ]);
+
+            // Save selected services from checkboxes
+            if ($this->selected_services) {
+                $vehicleJob->services()->attach($this->selected_services);
+            }
+
+            // Save washing and interior cleaning selections
+            if ($this->job['wash_type']) {
+                $washService = Service::where('name', $this->job['wash_type'])->first();
+                if ($washService) {
+                    $vehicleJob->services()->attach($washService->id);
+                }
+            }
+
+            if ($this->job['interior_cleaning']) {
+                $interiorService = Service::where('name', $this->job['interior_cleaning'])->first();
+                if ($interiorService) {
+                    $vehicleJob->services()->attach($interiorService->id);
+                }
+            }
+
+            DB::commit(); // Commit the transaction
+
+            // Reset the form fields
+            $this->reset(['job', 'selected_services', 'confirmingJobAddition']);
+
+            // Flash success message or emit event
+            session()->flash('message', 'Vehicle job created successfully!');
+
+            // Close the modal
+            $this->confirmingJobAddition = false;
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback the transaction on error
+
+            // Handle the exception
+            session()->flash('error', 'An error occurred while creating the vehicle job.');
         }
-
-        // Save washing and interior cleaning selections
-        if ($this->job['wash_type']) {
-            $washService = Service::where('name', $this->job['wash_type'])->first();
-            $vehicleJob->services()->attach($washService->id);
-        }
-
-        if ($this->job['interior_cleaning']) {
-            $interiorService = Service::where('name', $this->job['interior_cleaning'])->first();
-            $vehicleJob->services()->attach($interiorService->id);
-        }
-
-        // Reset the form fields
-        $this->reset(['job', 'selected_services', 'confirmingJobAddition']);
-
-        // Flash success message or emit event
-        session()->flash('message', 'Vehicle job created successfully!');
-
-        // Close the modal
-        $this->confirmingJobAddition = false;
     }
-
     public function updateJobServiceStatuses()
     {
         // Check if vehicleJob is set
@@ -134,16 +149,30 @@ class VehicleJobs extends Component
             return;
         }
 
+        $hasPendingServices = false; // Track if there are any pending services
+
         // Loop through each service's status and update the pivot table
         foreach ($this->serviceStatuses as $serviceId => $status) {
+            // Check if at least one service is 'pending'
+            if ($status === 'pending') {
+                $hasPendingServices = true;
+            }
+
             // Update the pivot table with the new status
             $this->vehicleJob->services()->updateExistingPivot($serviceId, ['status' => $status]);
         }
 
-        // Flash a success message
+        // If no pending services exist, update the main table
+        if (!$hasPendingServices) {
+            // Update the vehicle_jobs table to mark it as 'completed' or another appropriate status
+            $this->vehicleJob->update(['status' => 'completed']);
+        } else {
+            // Update the vehicle_jobs table to mark it as 'pending' or retain current status
+            $this->vehicleJob->update(['status' => 'pending']);
+        }
+
         session()->flash('message', 'Service statuses updated successfully.');
 
-        // Close the modal or reset data if needed
         $this->cancelJobView();
     }
 
@@ -164,7 +193,6 @@ class VehicleJobs extends Component
     
             // Calculate the completion percentage
             $completionPercentage = $totalServices > 0 ? ($completedServices / $totalServices) * 100 : 0;
-    
             $job->totalServices = $totalServices;
             $job->completedServices = $completedServices;
             $job->completionPercentage = $completionPercentage;

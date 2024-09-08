@@ -220,9 +220,9 @@
                                 @php
                                     $completedJob = $completedVehicleJobs->firstWhere('id', $job->id);
                                 @endphp
-                                <span class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-white 
-                                @if ($completedJob->completionPercentage < 50)
-                                    bg-red-500
+                                <span
+                                    class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium text-white 
+                                @if ($completedJob->completionPercentage < 50) bg-red-500
                                 @elseif ($completedJob->completionPercentage < 75)
                                     bg-amber-400
                                 @elseif ($completedJob->completionPercentage < 100)
@@ -232,6 +232,17 @@
                                 ">
                                     {{ round($completedJob->completionPercentage, 2) }} %
                                 </span>
+                            </td>
+                            @php
+                                $completionTime = \Carbon\Carbon::parse($job->created_at)->addMinutes(
+                                    $job->estimated_duration,
+                                );
+
+                                $formattedTime = $completionTime->format('M j, Y g:i A');
+                            @endphp
+
+                            <td class="border px-4 py-2 text-center">
+                                {{ $formattedTime }} 
                             </td>
                             <td class="border px-4 py-2 ">
                                 <x-button wire:click="confirmJobView({{ $job->id }})"

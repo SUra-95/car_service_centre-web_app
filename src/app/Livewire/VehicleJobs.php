@@ -89,26 +89,30 @@ class VehicleJobs extends Component
 
     public function saveVehicleJob($carId)
     {
-        // Validate inputs
         $this->validate([
             'job.wash_type' => 'required',
             'job.interior_cleaning' => 'required',
             'selected_services' => 'required|array|min:1',
         ]);
 
-        DB::beginTransaction(); // Start the transaction
+        DB::beginTransaction(); 
 
         try {
-            // Create the new VehicleJob record
             $vehicleJob = VehicleJob::create([
                 'status' => 'pending',
                 'car_id' => $carId,
                 'is_deleted' => 0,
             ]);
 
-            // Save selected services from checkboxes
+            $totalDuration = 0;
+
+            // Save selected services from checkboxes and calculate total duration
             if ($this->selected_services) {
-                $vehicleJob->services()->attach($this->selected_services);
+                $services = Service::whereIn('id', $this->selected_services)->get();
+                foreach ($services as $service) {
+                    $vehicleJob->services()->attach($service->id);
+                    $totalDuration += $service->time_duration_minutes; 
+                }
             }
 
             // Save washing and interior cleaning selections
@@ -116,6 +120,7 @@ class VehicleJobs extends Component
                 $washService = Service::where('name', $this->job['wash_type'])->first();
                 if ($washService) {
                     $vehicleJob->services()->attach($washService->id);
+                    $totalDuration += $washService->time_duration_minutes;
                 }
             }
 
@@ -123,10 +128,14 @@ class VehicleJobs extends Component
                 $interiorService = Service::where('name', $this->job['interior_cleaning'])->first();
                 if ($interiorService) {
                     $vehicleJob->services()->attach($interiorService->id);
+                    $totalDuration += $interiorService->time_duration_minutes;
                 }
             }
+            // Update the vehicle job with the total estimated duration
+            $vehicleJob->estimated_duration = $totalDuration;
+            $vehicleJob->save();
 
-            DB::commit(); // Commit the transaction
+            DB::commit();
 
             // Reset the form fields
             $this->reset(['job', 'selected_services', 'confirmingJobAddition']);
@@ -134,12 +143,12 @@ class VehicleJobs extends Component
             // Flash success message or emit event
             session()->flash('message', 'Vehicle job created successfully!');
 
-            // Close the modal
+            
             $this->confirmingJobAddition = false;
         } catch (\Exception $e) {
-            DB::rollBack(); // Rollback the transaction on error
+            DB::rollBack();
 
-            // Handle the exception
+            
             session()->flash('error', 'An error occurred while creating the vehicle job.');
         }
     }
@@ -151,7 +160,7 @@ class VehicleJobs extends Component
             return;
         }
 
-        $hasPendingServices = false; // Track if there are any pending services
+        $hasPendingServices = false;
 
         // Loop through each service's status and update the pivot table
         foreach ($this->serviceStatuses as $serviceId => $status) {
@@ -166,7 +175,7 @@ class VehicleJobs extends Component
 
         // If no pending services exist, update the main table
         if (!$hasPendingServices) {
-            // Update the vehicle_jobs table to mark it as 'completed' or another appropriate status
+            // Update the vehicle_jobs table status
             $this->vehicleJob->update(['status' => 'completed']);
 
             $carId = $this->vehicleJob->car_id;
@@ -199,10 +208,10 @@ class VehicleJobs extends Component
         $this->completedVehicleJobs = VehicleJob::with('services')->get()->map(function ($job) {
             // Total services for the job
             $totalServices = $job->services->count();
-    
+
             // Completed services for the job
             $completedServices = $job->services->where('pivot.status', 'completed')->count();
-    
+
             // Calculate the completion percentage
             $completionPercentage = $totalServices > 0 ? ($completedServices / $totalServices) * 100 : 0;
             $job->totalServices = $totalServices;

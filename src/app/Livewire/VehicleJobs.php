@@ -19,6 +19,7 @@ class VehicleJobs extends Component
     public $confirmingJobView = false;
     public $password;
     public $customers;
+    public $carId;
     // public $cars;
     public $filter;
     public $washing_services = [];
@@ -58,17 +59,16 @@ class VehicleJobs extends Component
         $this->getVehicleJobs();
     }
 
-    public function confirmJobAddition()
+    public function confirmJobAddition($id)
     {
+        $this->carId = $id;
         $this->confirmingJobAddition = true;
     }
 
     public function confirmJobView(VehicleJob $vehicleJob)
     {
 
-        // Retrieve the services associated with this VehicleJob using the pivot table
-        $this->jobServices = $vehicleJob->services()->withPivot('status')->get(); // Fetch related services
-
+        $this->jobServices = $vehicleJob->services()->withPivot('status')->get();
         $this->vehicleJob = $vehicleJob;
         foreach ($this->jobServices as $service) {
             $this->serviceStatuses[$service->id] = $service->pivot->status;
@@ -87,7 +87,7 @@ class VehicleJobs extends Component
         $this->confirmingJobView = false;
     }
 
-    public function saveVehicleJob($carId)
+    public function saveVehicleJob()
     {
         $this->validate([
             'job.wash_type' => 'required',
@@ -100,13 +100,12 @@ class VehicleJobs extends Component
         try {
             $vehicleJob = VehicleJob::create([
                 'status' => 'pending',
-                'car_id' => $carId,
+                'car_id' => $this->carId,
                 'is_deleted' => 0,
             ]);
 
             $totalDuration = 0;
 
-            // Save selected services from checkboxes and calculate total duration
             if ($this->selected_services) {
                 $services = Service::whereIn('id', $this->selected_services)->get();
                 foreach ($services as $service) {
@@ -115,7 +114,6 @@ class VehicleJobs extends Component
                 }
             }
 
-            // Save washing and interior cleaning selections
             if ($this->job['wash_type']) {
                 $washService = Service::where('name', $this->job['wash_type'])->first();
                 if ($washService) {
@@ -131,16 +129,13 @@ class VehicleJobs extends Component
                     $totalDuration += $interiorService->time_duration_minutes;
                 }
             }
-            // Update the vehicle job with the total estimated duration
             $vehicleJob->estimated_duration = $totalDuration;
             $vehicleJob->save();
 
             DB::commit();
 
-            // Reset the form fields
             $this->reset(['job', 'selected_services', 'confirmingJobAddition']);
 
-            // Flash success message or emit event
             session()->flash('message', 'Vehicle job created successfully!');
 
             
@@ -154,7 +149,6 @@ class VehicleJobs extends Component
     }
     public function updateJobServiceStatuses()
     {
-        // Check if vehicleJob is set
         if (!$this->vehicleJob) {
             session()->flash('error', 'Vehicle Job not found.');
             return;
@@ -162,20 +156,15 @@ class VehicleJobs extends Component
 
         $hasPendingServices = false;
 
-        // Loop through each service's status and update the pivot table
         foreach ($this->serviceStatuses as $serviceId => $status) {
-            // Check if at least one service is 'pending'
             if ($status === 'pending') {
                 $hasPendingServices = true;
             }
 
-            // Update the pivot table with the new status
             $this->vehicleJob->services()->updateExistingPivot($serviceId, ['status' => $status]);
         }
 
-        // If no pending services exist, update the main table
         if (!$hasPendingServices) {
-            // Update the vehicle_jobs table status
             $this->vehicleJob->update(['status' => 'completed']);
 
             $carId = $this->vehicleJob->car_id;
@@ -188,7 +177,6 @@ class VehicleJobs extends Component
 
             session()->flash('message', 'Service completed email sent successfully.');
         } else {
-            // Update the vehicle_jobs table to mark it as 'pending' or retain current status
             $this->vehicleJob->update(['status' => 'pending']);
         }
 
@@ -206,13 +194,10 @@ class VehicleJobs extends Component
     public function getVehicleJobs()
     {
         $this->completedVehicleJobs = VehicleJob::with('services')->get()->map(function ($job) {
-            // Total services for the job
             $totalServices = $job->services->count();
 
-            // Completed services for the job
             $completedServices = $job->services->where('pivot.status', 'completed')->count();
 
-            // Calculate the completion percentage
             $completionPercentage = $totalServices > 0 ? ($completedServices / $totalServices) * 100 : 0;
             $job->totalServices = $totalServices;
             $job->completedServices = $completedServices;
@@ -225,18 +210,14 @@ class VehicleJobs extends Component
 
     public function render()
     {
-        // Check if there is a search input
         if (!$this->search) {
-            // If no search input, return an empty result set
             return view('livewire.vehicle-jobs', [
-                'cars' => collect([]) // Pass an empty collection
+                'cars' => collect([]) 
             ]);
         }
 
-        // Start with a customer query
         $customerQuery = Customer::query();
 
-        // Apply search filters on the customer query
         if ($this->search) {
             $customerQuery->where(function ($q) {
                 $q->where('email', 'like', "%{$this->search}%")
@@ -244,25 +225,19 @@ class VehicleJobs extends Component
             });
         }
 
-        // Retrieve the first matching customer
         $customer = $customerQuery->first();
 
-        // Prepare a car query
         $carQuery = Car::query();
 
-        // If a customer was found, filter cars by the customer_id
         if ($customer) {
             $carQuery->where('customer_id', $customer->id);
         } else {
-            // If no customer found, return an empty result set
             return view('livewire.vehicle-jobs', [
-                'cars' => collect([]) // Pass an empty collection
+                'cars' => collect([]) 
             ]);
         }
 
-        // Paginate the car results
         $cars = $carQuery->paginate(4);
-        // Return the view with the cars data
         return view('livewire.vehicle-jobs', [
             'cars' => $cars,
             'vehicleJobs' => $this->vehicleJobs,
